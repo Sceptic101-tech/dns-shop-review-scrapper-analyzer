@@ -186,7 +186,7 @@ class DNS_Shop_Parser:
             desc_part = review.find_all('div', 'ow-opinion__text-desc') # extracting only user comments
             parsed_reviews.append({'Достоинства' : None, 'Недостатки' : None, 'Комментарий' : None, 'Фото' : None}) # not a bug, just feature
             for el in zip(title_part, desc_part):
-                parsed_reviews[-1][el[0].text] = el[1].text.replace(';', '\n') # merging label with comments to dictionary as key and value
+                parsed_reviews[-1][el[0].text] = el[1].text # merging label with comments to dictionary as key and value
         return parsed_reviews # list of dict, each element is review
     
     def open_DNS_site(self):
