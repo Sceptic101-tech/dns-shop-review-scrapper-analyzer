@@ -13,24 +13,31 @@ from argparse import Namespace
 
 class Vocabulary:
     '''Contains dictionary of tokens and their indices'''
-    def __init__(self, token_to_idx : dict = None, is_unk_token : bool = True, unk_token : str = '<UNK>'):
+    def __init__(self, token_to_idx : dict = None, mask_token = '<MASK>', unk_token : str = '<UNK>',\
+                 bos_token = 'BOS', eos_token = 'EOS', is_lexical_tokens=True):
         if token_to_idx is None:
             token_to_idx = {}
         self._token_to_idx = token_to_idx
-        self._idx_to_token = {idx : token for token, idx in token_to_idx.items()}
-        
-        self._is_unk_token = is_unk_token
-        self._unk_token = unk_token
-        self.unk_index = -1
+        self._idx_to_token = {value : key for key, value in token_to_idx.items()}
 
-        if is_unk_token:
-            self.unk_index = self.add_token(unk_token)
+        self._is_lexical_tokens = is_lexical_tokens
+        self.mask_token = mask_token
+        self._unk_token = unk_token
+        self._bos_token = bos_token
+        self._eos_token = eos_token
+
+        if is_lexical_tokens:
+            self.mask_token_index = self.add_token(mask_token)
+            self.unk_index = self.add_token(self._unk_token)
+            self._bos_index = self.add_token(self._bos_token)
+            self._eos_index = self.add_token(self._eos_token)
 
     def __len__(self) -> int:
         return len(self._token_to_idx)
 
-    def to_serializable(self) -> dict:
-        return {'token_to_idx' : self._token_to_idx, 'is_unk_token' : self._is_unk_token, 'unk_token' : self._unk_token}
+    def to_serializable(self) -> dict: # переделать
+        return {'token_to_idx' : self._token_to_idx, 'mask_token' : self.mask_token,\
+                'unk_token' : self._unk_token, 'bos_token' : self._bos_token, 'eos_token' : self._eos_token, 'is_lexical_tokens' : self._is_lexical_tokens}
     
     def to_json(self, filepath : str):
         with open(filepath, 'w', encoding='utf-8') as file:
@@ -82,13 +89,13 @@ class SeparatorTokenizer:
         return text.split(separator)
 
 class Vectorizer:
-    def __init__(self, tokens_vocab : Vocabulary, label_vocab : Vocabulary, max_sentence_len):
+    def __init__(self, tokens_vocab : Vocabulary, label_vocab : Vocabulary, max_sentence_len : int):
         '''max_sentence_len is using by vectorize() specified for CNN'''
         self.tokens_vocab = tokens_vocab
         self.label_vocab = label_vocab
         self.max_sentence_len = max_sentence_len
 
-    def vectorize_vector(self, tokens : list[str], is_target=False) -> np.array:
+    def vectorize_vector_onehot(self, tokens : list[str], is_target=False) -> np.array:
         '''Returns one hot vector'''
         cw_vocab = self.label_vocab if is_target else self.tokens_vocab
         one_hot = np.zeros(len(cw_vocab), dtype=np.float32)
@@ -96,13 +103,24 @@ class Vectorizer:
             one_hot[cw_vocab.get_token_index(token)] = 1
         return one_hot
     
-    def vectorize_matrix(self, tokens : list[str], is_target=False) -> np.array:
+    def vectorize_matrix_onehot(self, tokens : list[str]) -> np.array:
         '''Returns one hot matrix. Especially for Convolutional NN'''
         one_hot_matrix_size = (len(self.tokens_vocab), self.max_sentence_len)
         one_hot_matrix = np.zeros(one_hot_matrix_size, dtype=np.float32)
         for token_pos, token in enumerate(tokens):
             one_hot_matrix[self.tokens_vocab.get_token_index(token)][token_pos] = 1
         return one_hot_matrix
+    
+    def vectorize_vector_indices(self, tokens : list[str]):
+        indices = [self.tokens_vocab._bos_index]
+        for token in tokens:
+            indices.append(self.tokens_vocab.get_token_index(token))
+        indices.append(self.tokens_vocab._eos_index)
+
+        final_vec = np.zeros(self.max_sentence_len, dtype=np.int64)
+        final_vec[:len(indices)] = indices
+        final_vec[len(indices):] = self.tokens_vocab.mask_token_index
+        return final_vec
 
 
     @classmethod
@@ -142,10 +160,11 @@ class CustomDataset:
         self.set_dataframe_split('train')
 
     def __getitem__(self, index):
-        '''data and target collumns must be named 'x_data' and 'y_target'! '''
+        '''data and target collumns must be named 'x_data' and 'y_target'!\
+            Current realisation suitable for CNN and embeddings'''
         row = self._cw_dataframe.iloc[index]
-        data = self._vectorizer.vectorize_matrix(self._tokenizer.tokenize(row['x_data']), is_target=False)
-        target = self._vectorizer.vectorize_vector(row['y_target'], is_target=True)
+        data = self._vectorizer.vectorize_vector_indices(self._tokenizer.tokenize(row['x_data']))
+        target = self._vectorizer.vectorize_vector_onehot(row['y_target'], is_target=True)
         return {'x_data' : data,\
                 'y_target' : target}
     
