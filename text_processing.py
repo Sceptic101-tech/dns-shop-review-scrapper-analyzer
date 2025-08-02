@@ -120,7 +120,8 @@ class Vectorizer:
         final_vec = np.zeros(self.max_sentence_len, dtype=np.int64)
         final_vec[:len(indices)] = indices
         final_vec[len(indices):] = self.tokens_vocab.mask_token_index
-        return final_vec
+        
+        return final_vec, len(indices)
 
 
     @classmethod
@@ -163,10 +164,11 @@ class CustomDataset:
         '''data and target collumns must be named 'x_data' and 'y_target'!\
             Current realisation suitable for CNN and embeddings'''
         row = self._cw_dataframe.iloc[index]
-        data = self._vectorizer.vectorize_vector_indices(self._tokenizer.tokenize(row['x_data']))
+        data, useful_len = self._vectorizer.vectorize_vector_indices(self._tokenizer.tokenize(row['x_data']))
         target = self._vectorizer.vectorize_vector_onehot(row['y_target'], is_target=True)
         return {'x_data' : data,\
-                'y_target' : target}
+                'y_target' : target,
+                'useful_len' : useful_len}
     
     def __len__(self):
         return self._cw_df_len
