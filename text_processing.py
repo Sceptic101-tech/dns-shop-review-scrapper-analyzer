@@ -13,8 +13,8 @@ from argparse import Namespace
 
 class Vocabulary:
     '''Contains dictionary of tokens and their indices'''
-    def __init__(self, token_to_idx : dict = None, mask_token = '<MASK>', unk_token : str = '<UNK>',\
-                 bos_token = 'BOS', eos_token = 'EOS', is_lexical_tokens=True):
+    def __init__(self, token_to_idx : dict = None, mask_token : str = '<MASK>', unk_token : str = '<UNK>',\
+                 bos_token : str = 'BOS', eos_token : str = 'EOS', is_lexical_tokens=True):
         if token_to_idx is None:
             token_to_idx = {}
         self._token_to_idx = token_to_idx
@@ -51,6 +51,10 @@ class Vocabulary:
     @classmethod
     def from_serializable(cls, serializable : dict):
         return cls(**serializable)
+
+    @classmethod
+    def from_dataframe(cls, dataframe : pandas.DataFrame, tokenizer, treshold_freq=25):
+        pass
     
     def add_token(self, token : str) -> int:
         if token not in self._token_to_idx:
@@ -85,7 +89,8 @@ class SeparatorTokenizer:
         pass
 
     def tokenize(self, text : str, separator : str = ' ') -> list:
-        text = re.sub(r'([^\w\s]|_)', r' \1 ', text)
+        text = re.sub(r'([^\w\s]|_)', r' \1 ', text) # Отделяем пробелом знаки препинаня, они будут считаться отдельным токеном
+        text = re.sub(r'[\t\n\r\f\v]', r' ', text)
         return text.split(separator)
 
 class Vectorizer:
@@ -112,6 +117,7 @@ class Vectorizer:
         return one_hot_matrix
     
     def vectorize_vector_indices(self, tokens : list[str]):
+        '''Returns list of tokens indices. Use for Embedding layer as input'''
         indices = [self.tokens_vocab._bos_index]
         for token in tokens:
             indices.append(self.tokens_vocab.get_token_index(token))
@@ -122,6 +128,29 @@ class Vectorizer:
         final_vec[len(indices):] = self.tokens_vocab.mask_token_index
         
         return final_vec, len(indices)
+    
+    def vectorize_vectors_indices(self, tokens : list[str]) -> tuple[list, list, int]:
+        '''Use for sequence prediction.\
+        Returns two vectors and useful length(len without masking): \
+        **from_vector**(inputs for RNN at each timestamp)\
+        **to_vector**(expexted ouputs of RNNCell at each timestamp)'''
+
+        indices = [self.tokens_vocab._bos_index]
+        for token in tokens:
+            indices.append(self.tokens_vocab.get_token_index(token))
+        indices.append(self.tokens_vocab._eos_index)
+
+        from_vector = np.empty(self.max_sentence_len, dtype=np.int64)
+        from_indices = indices[:-1] # everything except last element
+        from_vector[:len(from_indices)] = from_indices
+        from_vector[len(from_indices):] = self.tokens_vocab.mask_token_index
+
+        to_vector = np.empty(self.max_sentence_len, dtype=np.int64)
+        to_indices = indices[1:] # everything except first element
+        to_vector[:len(from_indices)] = to_indices
+        to_vector[len(from_indices):] = self.tokens_vocab.mask_token_index
+        
+        return from_vector, to_vector, len(from_indices)
 
 
     @classmethod
@@ -162,12 +191,13 @@ class CustomDataset:
 
     def __getitem__(self, index):
         '''data and target collumns must be named 'x_data' and 'y_target'!\
-            Current realisation suitable for CNN and embeddings'''
+            Use current realisation for Embed and RNN text generation'''
         row = self._cw_dataframe.iloc[index]
-        data, useful_len = self._vectorizer.vectorize_vector_indices(self._tokenizer.tokenize(row['x_data']))
-        target = self._vectorizer.vectorize_vector_onehot(row['y_target'], is_target=True)
-        return {'x_data' : data,\
-                'y_target' : target,
+        from_vec, to_vec, useful_len = self._vectorizer.vectorize_vectors_indices(self._tokenizer.tokenize(row['x_data']))
+        label = self._vectorizer.vectorize_vector_onehot(row['y_target'], is_target=True)
+        return {'x_data' : from_vec,\
+                'y_target' : to_vec,
+                'label' : label,
                 'useful_len' : useful_len}
     
     def __len__(self):
