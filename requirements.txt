@@ -1,0 +1,11 @@
+beautifulsoup4
+pandas
+ipywidgets
+pymystem3
+scikit-learn
+selenium
+wordcloud
+undetected-chromedriver
+torch --index-url https://download.pytorch.org/whl/cu128
+transformers
+keybert
