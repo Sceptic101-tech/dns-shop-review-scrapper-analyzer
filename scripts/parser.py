@@ -4,16 +4,17 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+from config import Config
 import random
 import time
 import os.path
 
 # TODO mimicking a human reaction for actions
 
-WAITING_TIME_LB, WAITING_TIME_UB = (3,8)
+WAITING_TIME_LB, WAITING_TIME_UB = (Config.PARSER_WAITING_TIME_LB, Config.PARSER_WAITING_TIME_UB)
 
 class BrowserManager:
-    def __init__(self):
+    def __init__(self, headless):
         # dont use with undetected_chromedriver, it does this things automaticly
                 #self.driver_options = webdriver.ChromeOptions()
                 # # adding argument to disable the AutomationControlled flag
@@ -31,7 +32,7 @@ class BrowserManager:
                 # changing the property of the navigator value for webdriver to undefined. That helps be invisible for some bot detectors
                 # self.browser.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
-        self.browser = uc.Chrome()
+        self.browser = uc.Chrome(headless=headless)
         self.browser.implicitly_wait(5)
         self.browser.maximize_window()
         time.sleep(random.randint(WAITING_TIME_LB, WAITING_TIME_UB))
@@ -53,12 +54,12 @@ class BrowserManager:
                     self.browser.close()
                     self.browser.switch_to.window(original_window)
     
-    def write_cookies(self, filename='cookies.pkl'):
+    def write_cookies(self, filename : str):
         with open(filename, 'w') as file:
             cookies = self.browser.get_cookies()
             file.write(cookies)
     
-    def read_cookies(self, filename='cookies.pkl'):
+    def read_cookies(self, filename : str):
         if os.path.exists(filename):
             with open(filename, 'r') as file:
                 cookies = file.read()
@@ -150,8 +151,8 @@ class ParseHelper:
             file.write(raw_html)
 
 class DNS_Shop_Parser:
-    def __init__(self):
-        self.browser_manager = BrowserManager()
+    def __init__(self, headless : bool=False):
+        self.browser_manager = BrowserManager(headless=headless)
         self.navigator = NavigationManager(self.browser_manager)
         self.parse_helper = ParseHelper(self.browser_manager)
     
@@ -164,7 +165,7 @@ class DNS_Shop_Parser:
 
     # works only for dns_review page
     def show_more_reviews(self, desired_review_cnt):
-        button_click_cnt = (desired_review_cnt-4)//10 + 1 # magic number
+        button_click_cnt = (desired_review_cnt-4)//10 + 1 # magic number. Each button click produces 10 reviews. There is only 4 reviews displayed at the beggining
         for _ in range(button_click_cnt):
             time.sleep(random.randint(WAITING_TIME_LB, WAITING_TIME_UB))
             try:
