@@ -1,3 +1,4 @@
+torch --index-url https://download.pytorch.org/whl/cu128
 beautifulsoup4
 pandas
 ipywidgets
@@ -6,7 +7,7 @@ scikit-learn
 selenium
 wordcloud
 undetected-chromedriver
-torch --index-url https://download.pytorch.org/whl/cu128
 transformers
 keybert
 nltk
+flask

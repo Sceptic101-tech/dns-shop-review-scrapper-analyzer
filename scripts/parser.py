@@ -65,8 +65,8 @@ class BrowserManager:
                 cookies = file.read()
                 self.browser.add_cookie(cookies)
 
-    def __del__(self):
-        self.browser.quit()
+    # def __del__(self):
+    #     self.browser.quit()
 
 class NavigationManager:
     def __init__(self, browser : BrowserManager):
@@ -155,6 +155,7 @@ class DNS_Shop_Parser:
         self.browser_manager = BrowserManager(headless=headless)
         self.navigator = NavigationManager(self.browser_manager)
         self.parse_helper = ParseHelper(self.browser_manager)
+        self.successful_open=False
     
     def how_to_use(self):
         return '''
@@ -191,7 +192,8 @@ class DNS_Shop_Parser:
         return parsed_reviews # list of dict, each element is review
     
     def open_DNS_site(self):
-        self.navigator.try_open_page_via_search('днс', 'dns-shop.ru')
+        if self.navigator.try_open_page_via_search('днс', 'dns-shop.ru'):
+            self.successful_open=True
 
     def get_product_reviews(self, url_review_page, desired_review_cnt):
         self.navigator.try_open_page(url_review_page)
