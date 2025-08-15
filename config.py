@@ -12,20 +12,23 @@ class Config:
     NEGATIVE_IMAGE_PATH = os.path.join(STATIC_DIR, 'negative.png')
 
     # Парсер
-    # Верхняя и нижняя граница задержки перед осуществлением действия в браузере
-    PARSER_WAITING_TIME_LB = 3 # waiting time lower border
-    PARSER_WAITING_TIME_UB = 8 # upper border
+    PARSER_WAITING_TIME_LB = 3 # Нижняя граница задержки перед осуществлением действия в браузере
+    PARSER_WAITING_TIME_UB = 8 # Верхняя граница
     PARSER_REVIEWS_LB = 10 # min desired review cnt
     PARSER_REVIEWS_UB = 400 # max desired review cnt
 
+    # Parser Pool
+    PARSER_POOL_SIZE = 2
+    PARSER_POOL_BLOCK = True
+    PARSER_POOL_TIMEOUT = 5
+
     # Браузер
-    BROWSER_HEADLESS = True
-    BROWSER_CITE_OPENNIG_ATTEMPS = 2 # max attempts to open cite
-    BROWSER_DOWNLOAD_DIR = os.path.join(DATA_DIR, "downloads")
+    BROWSER_HEADLESS = False
+    BROWSER_CITE_OPENNIG_ATTEMPS = 2 # max attempts to open DNS cite
 
     # Анализ
-    ANALYZER_TO_LOWERCASE = False
-    ANALYZER_REVIEW_LEN_TRESHOLD = 3
+    ANALYZER_TO_LOWERCASE = True
+    ANALYZER_MIN_REVIEW_LEN_TRESHOLD = 3
     ANALYZER_LANGUAGE = 'russian'
     ANALYZER_ERASE_PUNCTUATION = False
     ANALYZER_THRESHOLD_KEYWORD_SCORE = 0.5
@@ -41,5 +44,5 @@ class Config:
     WORDCLOUD_BACKGROUND_COLOR = "black"
     WORDCLOUD_COLORMAP = "Pastel1"
     WORDCLOUD_RANDOM_STATE = 42
-    WORDCLOUD_COLLOCATIONS = True
+    WORDCLOUD_COLLOCATIONS = True # Позволяет использовать биграммы
     WORDCLOUD_MARGIN = 20

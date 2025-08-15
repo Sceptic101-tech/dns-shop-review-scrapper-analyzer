@@ -1,6 +1,5 @@
 from wordcloud import WordCloud
 from config import Config
-import os
 
 class WordCloudGenerator:
     def __init__(self, config: Config):

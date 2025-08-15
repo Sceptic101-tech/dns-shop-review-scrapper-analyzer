@@ -15,17 +15,17 @@ def convert_to_list_of_reviews(reviews, review_len_treshold = 2):
     return texts
 
 # Принимает список словарей, возвращает два списка строк - позитивные и неготивные отзывы
-def split_positive_negative_parts(reviews : list, review_len_treshold = 2) -> tuple[list, list]:
+def split_positive_negative_parts(reviews : list, review_min_len_treshold = 2) -> tuple[list, list]:
     dict_of_none = {'Достоинства' : None, 'Недостатки' : None, 'Комментарий' : None, 'Фото' : None}
     positive_list = []
     negative_list = []
     for review in reviews:
         if review != dict_of_none:
             for key, value in review.items():
-                if (value is not None) and (len(value.split(' ')) > review_len_treshold):
+                if (value is not None) and (len(value.split(' ')) > review_min_len_treshold):
                     if key == 'Достоинства':
                         positive_list.append(value)
-                    if key == 'Недостатки':
+                    elif key == 'Недостатки':
                         negative_list.append(value)
                     else:
                         break

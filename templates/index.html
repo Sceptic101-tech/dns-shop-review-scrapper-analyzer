@@ -1,68 +1,67 @@
 <!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <title>Анализ отзывов ДНС</title>
-  <style>
-    body {
-      display: grid;
-      flex-direction: column;
-      min-height: 0vh;
-      margin: 0;
-      text-align: center;
-    }
+  <head>
+    <meta charset="utf-8">
+    <title>Анализ отзывов ДНС</title>
+    <style>
+      body {
+        display: grid;
+        flex-direction: column;
+        min-height: 0vh;
+        margin: 0;
+        text-align: center;
+      }
 
-    header {
-      text-align: center;
-      padding-top: 1rem;
-    }
+      header {
+        text-align: center;
+        padding-top: 1rem;
+      }
 
-    input[type="url"],
-    input[type="number"] {
-      width: 200px;
-      padding: .5rem;
-      margin-top:.25rem;
-      box-sizing: border-box;
-    }
+      input[type="url"],
+      input[type="number"] {
+        width: 200px;
+        padding: .5rem;
+        margin-top:.25rem;
+        box-sizing: border-box;
+      }
 
-    button {
-      margin-top: 1rem;
-      /*padding: .6rem 1.2rem; */
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
+      button {
+        margin-top: 1rem;
+        /*padding: .6rem 1.2rem; */
+        font-size: 1rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
 
-<header>
-  <h1>Анализ отзывов на товары с сайта ДНС</h1>
-  <p>Иногда бывает сложно определиться с выбором подходящего товара, основываясь на отзывах покупателей.<br>
-     Этот сайт нацелен на разрешение дилеммы выбора.<br>
-     Для работы необходим обновленный до последней версии браузер Chrome.<br>
-  </p>
-</header>
+  <header>
+    <h1>Анализ отзывов на товары с сайта ДНС</h1>
+    <p>Иногда бывает сложно определиться с выбором подходящего товара, основываясь на отзывах покупателей.<br>
+      Этот сайт нацелен на разрешение дилеммы выбора.<br>
+    </p>
+  </header>
 
-<main class="form-wrapper">
-  <div class="form_container">
-    <form method="post">
-      <label for="review_url_id" ><br>URL страницы отзывов</label>
-      <input type="url"
-             id="review_url_id"
-             name="review_url">
+  <main class="form-wrapper">
+    <div class="form_container">
+      <form method="post">
+        <label for="review_url_id" ><br>URL страницы отзывов</label>
+        <input type="url"
+              id="review_url_id"
+              name="review_url">
 
-      <label for="review_cnt_id"><br>Желаемое количество отзывов для анализа</label>
-      <input type="number"
-             id="review_cnt_id"
-             name="review_cnt"
-             value="{{ min_reviews_value }}"
-             min="{{ min_reviews_value }}"
-             max="{{ max_review_value }}">
+        <label for="review_cnt_id"><br>Желаемое количество отзывов для анализа</label>
+        <input type="number"
+              id="review_cnt_id"
+              name="review_cnt"
+              value="{{ min_reviews_value }}"
+              min="{{ min_reviews_value }}"
+              max="{{ max_review_value }}">
 
-      <button type="submit">Проанализировать</button>
-    </form>
-  </div>
-</main>
+        <button type="submit">Проанализировать</button>
+      </form>
+    </div>
+  </main>
 
-</body>
+  </body>
 </html>
