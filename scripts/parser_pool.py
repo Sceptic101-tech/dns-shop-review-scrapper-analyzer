@@ -2,7 +2,21 @@ from queue import Queue, Empty, Full
 from scripts.parser import DNS_Shop_Parser
 
 class ParserPool:
-    def __init__(self, size:int, block:bool=True, timeout:float=None, browser_headless:bool=True):
+    """
+    Пул объектов `DNS_Shop_Parser`.
+
+    Parameters
+    ----------
+    size : int
+        Количество парсеров в пуле.
+    block : bool
+        Если True – при попытке получить/положить элемент из пула, ожидать до timeout.
+    timeout : float
+        Время ожидания (сек.) для операций `get` и `put`.
+    browser_headless : bool
+        Флаг, передаваемый в конструктор каждого парсера.
+    """
+    def __init__(self, size:int, block:bool, timeout:float, browser_headless:bool):
         self._pool = Queue(maxsize=size)
         self._block = block
         self._timeout = timeout
@@ -11,6 +25,14 @@ class ParserPool:
             self._pool.put(parser, self._block, self._timeout)
 
     def get(self):
+        """
+        Получает парсер из пула.
+
+        Returns
+        -------
+        DNS_Shop_Parser | None
+            Возвращает объект парсера или `None`, если очередь пуста.
+        """
         try:
            return self._pool.get(self._block, self._timeout)
         except Empty:
@@ -18,6 +40,19 @@ class ParserPool:
 
 
     def put(self, parser):
+        """
+        Положить парсер обратно в пул.
+
+        Parameters
+        ----------
+        parser : DNS_Shop_Parser
+            Объект, который нужно вернуть в пул.
+
+        Returns
+        -------
+        bool | None
+            `True` – если добавлено успешно, `None` – при переполнении.
+        """
         try:
             self._pool.put(parser, self._block, self._timeout)
             return True

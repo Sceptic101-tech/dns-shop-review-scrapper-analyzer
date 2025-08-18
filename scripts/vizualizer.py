@@ -2,11 +2,33 @@ from wordcloud import WordCloud
 from config import Config
 
 class WordCloudGenerator:
-    def __init__(self, config: Config):
-        self.config = config
+    """
+    Генератор облаков слов.
+
+    Параметры визуализации берутся из модуля `config`.
+    """
+    def __init__(self):
+        pass
 
     @classmethod
-    def generate(cls, freq_dict: dict[str, float], filepath=None, save_image=True):
+    def generate(cls, freq_dict: dict[str, float], filepath, save_image=True):
+        """
+        Создаёт облако слов и сохраняет его в файл.
+
+        Parameters
+        ----------
+        freq_dict : dict[str, float]
+            Словарь с частотами ключевых слов.
+        filepath : str
+            Путь к файлу, куда будет сохранено изображение.
+        save_image : bool, optional
+            Если True – сохранить картинку в `filepath`, иначе вернуть объект Image.
+
+        Returns
+        -------
+        PIL.Image.Image
+            Созданное облако слов (изображение).
+        """
         wc = WordCloud(
             width=Config.WORDCLOUD_WIDTH,
             height=Config.WORDCLOUD_HEIGHT,
