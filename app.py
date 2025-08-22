@@ -7,7 +7,6 @@ import scripts.text_processing as tp
 import scripts.analyzer as text_analyzer
 from scripts.vizualizer import WordCloudGenerator
 from pymystem3 import Mystem
-import uuid
 import nltk
 import time
 
@@ -133,15 +132,16 @@ def analyzing():
         if parser_pool.put(parser) is None:
             return render_template('error.html', error_cause=error_codes_dict[521])
         else:
-            unique_id = str(uuid.uuid4())
             return render_template('results.html', 
-                                   positive_img_src="static/positive.png", 
-                                   negative_img_src="static/negative.png")
+                                   positive_img_src='static/positive.png', 
+                                   negative_img_src='static/negative.png')
 
   
 @app.route('/results', methods=['GET'])
 def results():
-   return render_template('results.html', positive_img_src="static/positive.png", negative_img_src="static/negative.png")
+   return render_template('results.html', 
+                                   positive_img_src='static/positive.png', 
+                                   negative_img_src='static/negative.png')
 
 @app.route('/error', methods=['GET'])
 def error():

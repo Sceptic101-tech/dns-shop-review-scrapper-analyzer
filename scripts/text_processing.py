@@ -112,10 +112,9 @@ def lemmatize_texts(list_of_texts: list[str], mystem: Mystem) -> list:
     lemmatized_list = lemmatized_text.split(separator)
     return lemmatized_list
 
-# Токенизация и очистка от стоп-слов (не используется, поскольку отсутствие стоп-слов портит семантику корпуса => несвязанные ключевые N-граммы)
 def delete_stop_words(list_of_texts: list[str], language: str, allowed_stopwords: list[str]=None) -> list[str]:
     """
-    Удаляет стоп‑слова из списка строк. На данный момент не используется.
+    Удаляет стоп‑слова из списка строк.
 
     Parameters
     ----------

@@ -2,7 +2,7 @@ import os
 
 class Config:
 
-    USE_PREPARED = False
+    USE_PREPARED = True
 
     # Пути
     DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
@@ -36,16 +36,16 @@ class Config:
     ANALYZER_TOP_N_KEYWORDS = 2 # Количество извлекаемых ключевых фраз
     ANALYZER_CONFIDENCE_TRESHOLD = 0.5 # Порог косинусного сходства фразы с отзывом
     ANALYZER_KEYPHRASE_NGRAM_RANGE = (2, 3) # Количество токенов в ключевой фразе
-    # ANALYZER_KEYBERT_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2" Плохое качество ключевых фраз
-    ANALYZER_KEYBERT_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+    # ANALYZER_KEYBERT_MODEL_NAME = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2' Плохое качество ключевых фраз
+    ANALYZER_KEYBERT_MODEL_NAME = 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2'
     ANALYZER_KEYBERT_DIVERSITY = 0.7 # Разнообразие ключевых фраз. Чем выше, тем более разнообразны фразы
     ANALYZER_ALLOWED_STOPWORDS = ['не', 'ни', 'но'] # Стоп-слова, которые не будут удаляться
 
     # WordCloud
     WORDCLOUD_WIDTH = 1000 # 
     WORDCLOUD_HEIGHT = 1000 # 
-    WORDCLOUD_BACKGROUND_COLOR = "black" # 
-    WORDCLOUD_COLORMAP = "Pastel1" # 
+    WORDCLOUD_BACKGROUND_COLOR = 'black' # 
+    WORDCLOUD_COLORMAP = 'Pastel1' # 
     WORDCLOUD_RANDOM_STATE = 42 # 
     WORDCLOUD_COLLOCATIONS = True # Позволяет использовать N_GRAMMы
     WORDCLOUD_MARGIN = 20 # 

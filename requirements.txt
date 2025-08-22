@@ -10,3 +10,4 @@ transformers
 keybert
 nltk
 flask
+hf_xet
